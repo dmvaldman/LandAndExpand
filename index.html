@@ -104,7 +104,7 @@
 
             async function loadAndRenderMarkdown() {
                 try {
-                    const response = await fetch('meltdown.md');
+                    const response = await fetch('docs/meltdown.md');
                     if (!response.ok) throw new Error('Network response failed.');
                     let rawText = await response.text();
 
