@@ -1,3 +1,10 @@
+---
+Title: Meltdown
+Author: Nick Land
+Date: 1994
+Original Source: https://web.archive.org/web/20250201021520/https://www.ccru.net/swarm1/1_melt.htm
+---
+
 The story goes like this:
 
 Earth is captured by a technocapital singularity[^1] as renaissance rationalitization and oceanic navigation lock into commoditization take-off.[^2] Logistically accelerating techno-economic interactivity crumbles social order in auto-sophisticating machine runaway.[^3] As markets learn to manufacture intelligence[^4], politics modernizes, upgrades paranoia, and tries to get a grip.[^5]

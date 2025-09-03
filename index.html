@@ -76,14 +76,13 @@
 </head>
 <body class="bg-gray-900 text-gray-300">
 
-    <div class="max-w-4xl mx-auto p-4 sm:p-8">
+    <!-- <div id="annotation-popup" class="hidden fixed bg-gray-900 border border-yellow-500/50 text-white p-4 rounded-lg shadow-2xl text-base z-50 transition-opacity duration-200 w-[90vw] sm:w-auto sm:max-w-sm md:max-w-md"></div> -->
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 font-mono">
         <header class="text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl font-bold text-yellow-400 tracking-wider">MELTDOWN</h1>
-            <p class="text-gray-400 mt-2">by Nick Land (Annotated by AI)</p>
-            <p class="text-gray-500 mt-4 text-sm">
-                Originally published 1994.
-                <a href="https://web.archive.org/web/20250201021520/https://www.ccru.net/swarm1/1_melt.htm" target="_blank" rel="noopener noreferrer" class="text-yellow-500 hover:text-yellow-400 underline">Read original text</a>
-            </p>
+            <h1 id="content-title" class="text-4xl sm:text-5xl font-bold text-yellow-400 tracking-wider"></h1>
+            <p id="content-author" class="text-gray-400 mt-2"></p>
+            <p id="content-meta" class="text-gray-500 mt-4 text-sm"></p>
         </header>
 
         <main id="content-container" class="space-y-6 text-lg leading-relaxed sm:leading-loose">
@@ -101,25 +100,58 @@
             const contentContainer = document.getElementById('content-container');
             const popup = document.getElementById('annotation-popup');
             let hideTimeout;
+            let isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
             async function loadAndRenderMarkdown() {
                 try {
                     const response = await fetch('meltdown.md');
                     if (!response.ok) throw new Error('Network response failed.');
-                    const markdown = await response.text();
+                    let rawText = await response.text();
+
+                    const frontMatter = parseFrontMatter(rawText);
+
+                    if (frontMatter.metadata) {
+                        document.getElementById('content-title').textContent = frontMatter.metadata.Title.toUpperCase();
+                        document.getElementById('content-author').textContent = `by ${frontMatter.metadata.Author} (Annotated by AI)`;
+
+                        let metaHtml = `Originally published ${frontMatter.metadata.Date}.`;
+                        if (frontMatter.metadata['Original Source']) {
+                            metaHtml += ` <a href="${frontMatter.metadata['Original Source']}" target="_blank" rel="noopener noreferrer" class="text-yellow-500 hover:text-yellow-400 underline">Read original text</a>`;
+                        }
+                        document.getElementById('content-meta').innerHTML = metaHtml;
+                    }
 
                     marked.use(markedFootnote());
-
-                    contentContainer.innerHTML = marked.parse(markdown, { breaks: true });
-
-                    console.log('Generated HTML:', contentContainer.innerHTML); // Debugging line
-
-                    // Defer setup to allow the DOM to update after innerHTML assignment
-                    setTimeout(setupPopoverEventListeners, 0);
+                    contentContainer.innerHTML = marked.parse(frontMatter.content, { breaks: true });
+                    setTimeout(setupPopoverEventListeners, 0); // Defer setup to ensure DOM is updated
                 } catch (error) {
                     console.error('Failed to load or render markdown:', error);
                     contentContainer.innerHTML = `<p class="text-red-400">Error loading content. Please try again later.</p>`;
                 }
+            }
+
+            function parseFrontMatter(text) {
+                const frontMatterRegex = /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---\s*[\r\n]+/;
+                const match = text.match(frontMatterRegex);
+
+                if (!match) {
+                    return { metadata: null, content: text };
+                }
+
+                const frontMatterBlock = match[1];
+                const content = text.slice(match[0].length);
+
+                const metadata = {};
+                frontMatterBlock.split('\n').forEach(line => {
+                    const parts = line.split(':');
+                    if (parts.length >= 2) {
+                        const key = parts[0].trim();
+                        const value = parts.slice(1).join(':').trim();
+                        metadata[key] = value;
+                    }
+                });
+
+                return { metadata, content };
             }
 
             function showPopup(element) {
@@ -165,8 +197,7 @@
             }
 
             function setupPopoverEventListeners() {
-                const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-                const footnoteLinks = contentContainer.querySelectorAll('a[data-footnote-ref]');
+                const footnoteLinks = document.querySelectorAll('a[data-footnote-ref]');
                 let activePopupElement = null;
 
                 footnoteLinks.forEach(link => {
