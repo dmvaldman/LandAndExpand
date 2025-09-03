@@ -78,7 +78,7 @@
 
     <!-- <div id="annotation-popup" class="hidden fixed bg-gray-900 border border-yellow-500/50 text-white p-4 rounded-lg shadow-2xl text-base z-50 transition-opacity duration-200 w-[90vw] sm:w-auto sm:max-w-sm md:max-w-md"></div> -->
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 font-mono">
+    <div class="max-w-4xl mx-auto p-4 sm:p-8">
         <header class="text-center mb-12">
             <h1 id="content-title" class="text-4xl sm:text-5xl font-bold text-yellow-400 tracking-wider"></h1>
             <p id="content-author" class="text-gray-400 mt-2"></p>
@@ -116,7 +116,7 @@
 
                         let metaHtml = `Originally published ${frontMatter.metadata.Date}.`;
                         if (frontMatter.metadata['Original Source']) {
-                            metaHtml += ` <a href="${frontMatter.metadata['Original Source']}" target="_blank" rel="noopener noreferrer" class="text-yellow-500 hover:text-yellow-400 underline">Read original text</a>`;
+                            metaHtml += ` <a href="${frontMatter.metadata['Original Source']}" target="_blank" rel="noopener noreferrer" class="text-yellow-500 hover:text-yellow-400 underline">Read the original</a>`;
                         }
                         document.getElementById('content-meta').innerHTML = metaHtml;
                     }
